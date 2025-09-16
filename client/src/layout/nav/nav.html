@@ -1,8 +1,8 @@
-<header class="p-3 w-full fixed top-0 z-50 bg-primary">
+<header class="p-3 w-full fixed top-0 z-50 bg-base-100 shadow">
     <div class="flex align-middle items-center px-10 mx-auto gap-6">
-        <div class="text-white">
-            <a routerLink="/" routerLinkActive="text-accent" [routerLinkActiveOptions]="{exact: true}"
-                class="flex items-center gap-3 max-h-16 border-r-white border-r-2 pr-6">
+        <div class="text-base">
+            <a routerLink="/" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}"
+                class="flex items-center gap-3 max-h-16 border-r-base-content border-r-2 pr-6">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8">
                     <path fill-rule="evenodd"
                         d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
@@ -11,25 +11,25 @@
                 <h3 class="text-2xl font-semibold uppercase">DatingApp</h3>
             </a>
         </div>
-        <nav class="flex gap-3 my-2 uppercase text-lg text-white">
+        <nav class="flex gap-3 my-2 uppercase text-lg text-base-content">
             @if (accountService.currentUser()){
-            <a routerLink="/members" routerLinkActive="text-accent"
+            <a routerLink="/members" routerLinkActive="text-primary"
                 [routerLinkActiveOptions]="{exact: true}">Matches</a>
-            <a routerLink="/lists" routerLinkActive="text-accent" [routerLinkActiveOptions]="{exact: true}">Lists</a>
-            <a routerLink="/messages" routerLinkActive="text-accent"
+            <a routerLink="/lists" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}">Lists</a>
+            <a routerLink="/messages" routerLinkActive="text-primary"
                 [routerLinkActiveOptions]="{exact: true}">Messages</a>
             }
-            <a routerLink="/errors" routerLinkActive="text-accent" [routerLinkActiveOptions]="{exact: true}">Errors</a>
+            <a routerLink="/errors" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}">Errors</a>
         </nav>
 
         @if (busyService.bussyRequestCount() > 0){
-            <span class="loading loading-spinner text-accent"></span>
+            <span class="loading loading-spinner text-primary"></span>
         }
 
         <div class="flex align-middle ml-auto gap-3">
             <div class="dropdown mr-5 dropdown-end">
                 <button tabindex="1"
-                    class="flex flex-col justify-center align-middle text-white cursor-pointer uppercase text-xs"><svg
+                    class="flex flex-col justify-center align-middle text-base-content cursor-pointer uppercase text-xs"><svg
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 self-center">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -37,7 +37,7 @@
                     </svg>
                     <span>{{selectedTheme()}}</span>
                 </button>
-                <ul tabindex="1" class="dropdown-content z-50 menu bg-base-100 rounded-box w-52 p-2 shadow-sm">
+                <ul tabindex="1" class="dropdown-content z-50 menu bg-base-200 rounded-box w-52 p-2 shadow-sm">
                     @for (theme of themes; track $index) {
                         <li (click)="handleSelectTheme(theme)">
                             <a>{{theme}}</a>
@@ -47,11 +47,11 @@
             </div>
             @if (accountService.currentUser(); as user){
             <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="flex text-white items-center text-xl gap-3 cursor-pointer">
+                <div tabindex="0" role="button" class="flex text-base-content items-center text-xl gap-3 cursor-pointer">
                     <img [src]="user?.imageUrl || '/user.png'" alt="user avatar" class="w-10 h-10 rounded-full">
                     <span>{{user.displayName}}</span>
                 </div>
-                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-1 w-52 p-2 shadow-sm">
                     <li><a routerLink="/members/{{user.id}}">Profile</a></li>
                     <li><a (click)="logout()">Logout</a></li>
                 </ul>
