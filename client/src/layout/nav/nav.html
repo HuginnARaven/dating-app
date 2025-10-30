@@ -18,6 +18,8 @@
             <a routerLink="/lists" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}">Lists</a>
             <a routerLink="/messages" routerLinkActive="text-primary"
                 [routerLinkActiveOptions]="{exact: true}">Messages</a>
+            <a *appHasRole="['Admin', 'Moderator']" routerLink="/admin" routerLinkActive="text-primary"
+                [routerLinkActiveOptions]="{exact: true}">Admin</a>
             }
             <a routerLink="/errors" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}">Errors</a>
         </nav>

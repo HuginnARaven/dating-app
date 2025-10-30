@@ -485,3 +485,10 @@ $RECYCLE.BIN/
 API/appsettings.json
 API/dating.db*
 .vscode
+
+# SSL Certificates
+*.pem
+*.crt
+*.key
+*.p12
+*.pfx
