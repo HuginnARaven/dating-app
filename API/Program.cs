@@ -5,6 +5,7 @@ using API.Helpers;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,9 @@ builder.Services.AddScoped<ILikesRepository, LikesRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<LogUserActivity>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<PresenceTracker>();
+
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -41,6 +45,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
         ValidateAudience = false,
         ValidateIssuer = false
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = contex =>
+        {
+            var accesToken = contex.Request.Query["access_token"];
+
+            var path = contex.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accesToken) && path.StartsWithSegments("/hubs"))
+            {
+                contex.Token = accesToken;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddAuthorizationBuilder()
@@ -57,6 +77,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;

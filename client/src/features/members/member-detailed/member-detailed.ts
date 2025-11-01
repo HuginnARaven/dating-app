@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { AgePipe } from '../../../core/pipes/age-pipe';
 import { AccountService } from '../../../core/services/account-service';
 import { MemberService } from '../../../core/services/member-service';
+import { PresenceService } from '../../../core/services/presence-service';
 
 @Component({
   selector: 'app-member-detailed',
@@ -15,8 +16,9 @@ import { MemberService } from '../../../core/services/member-service';
 export class MemberDetailed implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private accountService = inject(AccountService)
-  protected memberService = inject(MemberService)
+  private accountService = inject(AccountService);
+  protected memberService = inject(MemberService);
+  protected presenceService = inject(PresenceService);
   protected title = signal<string | undefined>('Profile');
   protected isCurrentUser = computed(() => {
     return this.accountService.currentUser()?.id === this.route.snapshot.paramMap.get('id');

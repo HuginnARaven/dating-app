@@ -34,7 +34,7 @@
                 </form>
             </div>
         } @else {
-            <div>{{member.description}}</div>
+            <div>{{member.description || 'No description for now'}}</div>
         }
     </div>
 }
