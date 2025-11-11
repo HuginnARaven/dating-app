@@ -1,14 +1,15 @@
 using System;
+using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AdminController(UserManager<AppUser> userManager) : BaseApiController
+public class AdminController(UserManager<AppUser> userManager, IUnitOfWork uow, IPhotoService photoService) : BaseApiController
 {
     [Authorize(Policy = "RequireAdminRole")]
     [HttpGet("users-with-roles")]
@@ -52,8 +53,48 @@ public class AdminController(UserManager<AppUser> userManager) : BaseApiControll
 
     [Authorize(Policy = "ModeratePhotoRole")]
     [HttpGet("photos-to-moderate")]
-    public ActionResult GetPhotosForModeration()
+    public async Task<ActionResult<IEnumerable<PhotoForApprovalDto>>> GetPhotosForModeration()
     {
-        return Ok("Admins or moderators can see this");
+        return Ok(await uow.PhotoRepository.GetUnapprovedPhotos());
+    }
+
+    [Authorize(Policy = "ModeratePhotoRole")]
+    [HttpPost("photos-to-moderate/{photoId}/approve")]
+    public async Task<ActionResult> ApprovePhoto(string photoId)
+    {
+        var photo = await uow.PhotoRepository.GetPhotoById(photoId);
+        if (photo == null) return BadRequest("Photo with such Id does not exists");
+        var member = await uow.MemberRepository.GetMemberForUpdate(photo.MemberId);
+        if (member == null) return BadRequest("Member with such photo does not exists");
+
+        photo.IsApproved = true;
+        if (member.ImageUrl == null)
+        {
+            member.ImageUrl = photo.Url;
+            member.User.ImageUrl = photo.Url;
+        }
+
+        if (await uow.Complete()) return Ok();
+        return BadRequest("Problem with approving photo");
+    }
+
+    [Authorize(Policy = "ModeratePhotoRole")]
+    [HttpDelete("photos-to-moderate/{photoId}/reject")]
+    public async Task<ActionResult> RejectPhoto(string photoId)
+    {
+        var photo = await uow.PhotoRepository.GetPhotoById(photoId);
+        if (photo == null) return BadRequest("Photo with such Id does not exists");
+
+        if (photo.PublicId != null)
+        {
+            var result = await photoService.DeletePhotoAsync(photo.PublicId);
+            if (result.Error != null) return BadRequest(result.Error.Message);
+        }
+        
+        uow.PhotoRepository.RemovePhoto(photo);
+
+        if (await uow.Complete()) return NoContent();
+        return BadRequest("Problem with deleting photo");
     }
 }
+ 

@@ -4,19 +4,23 @@
 <div class="grid grid-cols-4 auto-rows-min gap-3 p-5 h-[65vh] overflow-auto">
     @for (photo of photos; track photo.id) {
     <div class="relative">
-        <img src="{{photo.url}}" alt="photo of member" class="w-full rounded-lg">
+        <img src="{{photo.url}}" alt="photo of member" class="w-full rounded-lg" [class.opacity-30]="!photo.isApproved">
         @if (accoundService.currentUser()?.id === memberService.member()?.id){
-        <app-star-button 
-            [isSelected]="photo.url === memberService.member()?.imageUrl" 
-            [isDisabled]="photo.url === memberService.member()?.imageUrl" 
-            (clickEvent)="setMainPhoto(photo)"
-            class="absolute top-1 right-1"
-        />
-        <app-delete-button
-            [isDisabled]="photo.url === memberService.member()?.imageUrl" 
-            (clickEvent)="deletePhoto(photo)"
-            class="absolute top-1 left-1"
-        />
+            @if (!photo.isApproved) {
+                <div class="absolute bottom-2 flex w-full justify-center"><div class="badge badge-outline badge-error">awaiting approval</div></div>
+            }
+            <app-star-button 
+                [isSelected]="photo.url === memberService.member()?.imageUrl" 
+                [isDisabled]="photo.url === memberService.member()?.imageUrl || !photo.isApproved" 
+                [class.hidden]="!photo.isApproved"
+                (clickEvent)="setMainPhoto(photo)"
+                class="absolute top-1 right-1"
+            />
+            <app-delete-button
+                [isDisabled]="photo.url === memberService.member()?.imageUrl" 
+                (clickEvent)="deletePhoto(photo)"
+                class="absolute top-1 left-1"
+            />
         }
     </div>
     }

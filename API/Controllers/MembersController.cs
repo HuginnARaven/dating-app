@@ -33,7 +33,7 @@ namespace API.Controllers
         [HttpGet("{id}/photos")]
         public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(string id)
         {
-            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id));
+            return Ok(await uow.MemberRepository.GetPhotosForMemberAsync(id, User.GetMemberId() == id));
         }
 
         [HttpPut]
@@ -77,12 +77,6 @@ namespace API.Controllers
                 MemberId = User.GetMemberId()
             };
 
-            if (member.ImageUrl == null)
-            {
-                member.ImageUrl = photo.Url;
-                member.User.ImageUrl = photo.Url;
-            }
-
             member.Photos.Add(photo);
 
             if (await uow.Complete()) return photo;
@@ -98,7 +92,7 @@ namespace API.Controllers
 
             var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);
 
-            if (member.ImageUrl == photo?.Url || photo == null)
+            if (member.ImageUrl == photo?.Url || photo == null || !photo.IsApproved)
             {
                 return BadRequest("Cannot set this as main photo");
             }
@@ -126,7 +120,7 @@ namespace API.Controllers
                 if (result.Error != null) return BadRequest(result.Error.Message);
             }
 
-            member.Photos.Remove(photo);
+            uow.PhotoRepository.RemovePhoto(photo);
 
             if (await uow.Complete()) return Ok();
 

@@ -36,6 +36,14 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     cache.clear();
   }
 
+  if (req.method.includes('POST') && req.url.includes('/admin')) {
+    cache.clear();
+  }
+
+  if (req.method.includes('DELETE') && req.url.includes('/admin')) {
+    cache.clear();
+  }
+
   if (req.method === 'GET'){
     const cacheResponse = cache.get(cacheKey);
     if (cacheResponse){
