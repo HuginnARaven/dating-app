@@ -484,6 +484,7 @@ $RECYCLE.BIN/
 *.swp
 API/appsettings.json
 API/dating.db*
+API/wwwroot
 .vscode
 
 # SSL Certificates
@@ -492,3 +493,4 @@ API/dating.db*
 *.key
 *.p12
 *.pfx
+
